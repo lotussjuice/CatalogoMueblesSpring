@@ -1,0 +1,55 @@
+services:
+  # Servicio de Base de Datos
+  mysqldb:
+    image: mysql:8.0
+    container_name: muebleria_db_container
+    ports:
+    # Mapeo del puerto 3306 del contenedor al 3307 del host para evitar conflictos
+      - "3307:3306"
+    environment:
+      # Configuración de la base de datos
+      MYSQL_DATABASE: muebleria_db
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: root
+      MYSQL_USER: user
+    volumes:
+      # Persistencia de datos
+      - db_data:/var/lib/mysql
+    networks:
+      # Recomendacion IA para evitar errores
+      - muebleria_net
+    restart: always
+    # Verificación de salud para asegurar que MySQL esté listo antes de que la app intente conectarse
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Servicio de la aplicación
+  app:
+    build: .
+    container_name: muebleria_app_container
+    ports:
+    # Mapeo del puerto 8080 del contenedor al 8080 del host
+      - "8080:8080"
+    depends_on:
+      mysqldb:
+        condition: service_healthy 
+    environment:
+      SERVER_PORT: 8080
+      # Configuración de la conexión a la base de datos
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysqldb:3306/muebleria_db?allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    networks:  
+      - muebleria_net
+
+volumes:
+# Volumen para persistencia de datos de MySQL
+  db_data:
+
+# Definimos la red explícitamente para evitar errores de DNS
+networks:
+  muebleria_net:
+    driver: bridge

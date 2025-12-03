@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Cotizar - Mueblería </title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div th:replace="sidebar :: sidebar(perfil='cliente')"></div>
+
+    <div class="content">
+        <h1>Realizar Cotización</h1>
+
+        <div th:if="${error}" class="alert alert-danger">
+            <span th:text="${error}"></span>
+        </div>
+
+        <div class="card">
+            <h2>Catálogo de Muebles</h2>
+            <table>
+                <thead>
+                    <tr><th>Mueble</th><th>Detalles</th><th>Precio</th><th>Stock</th><th>Acción</th></tr>
+                </thead>
+                <tbody>
+                    <tr th:each="m : ${muebles}">
+                        <td th:text="${m.nombre}" style="font-weight: bold;"></td>
+                        <td><span th:text="${m.material}"></span> - <span th:text="${m.tamano}"></span></td>
+                        <td th:text="'$' + ${m.precioBase}"></td>
+                        
+                        <td th:text="${m.stock}" th:style="${m.stock == 0 ? 'color:red; font-weight:bold;' : ''}"></td>
+
+                        <td>
+                            <form th:if="${m.stock > 0}" action="/web/cliente/cotizar/agregar" method="post" style="display: flex; gap: 5px;">
+                                <input type="hidden" name="muebleId" th:value="${m.id}">
+                                <select name="varianteId" style="width: 120px; padding: 5px;">
+                                    <option value="">Estándar</option>
+                                    <option th:each="v : ${variantes}" th:value="${v.id}" th:text="${v.nombre} + ' (+$' + ${v.aumentoPrecio} + ')'"></option>
+                                </select>
+                                <input type="number" name="cantidad" value="1" min="1" th:max="${m.stock}" style="width: 50px;">
+                                <button type="submit" class="btn-primary" style="padding: 5px 10px; width: auto;">+</button>
+                            </form>
+                            <span th:if="${m.stock == 0}" style="color: red;">Agotado</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card" style="margin-top: 30px; border-top: 4px solid #8B4513;">
+            <h2 style="color: #8B4513;">🛒 Tu Carrito</h2>
+            
+            <table th:if="${!carrito.items.empty}">
+                <thead>
+                    <tr><th>Producto</th><th>Variante</th><th>Cant.</th><th>Subtotal</th><th>Acciones</th></tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${carrito.items}">
+                        <td th:text="${item.mueble.nombre}"></td>
+                        <td th:text="${item.variante != null ? item.variante.nombre : 'Estándar'}"></td>
+                        
+                        <td>
+                            <form action="/web/cliente/cotizar/modificar" method="post" style="display: flex; gap: 5px;">
+                                <input type="hidden" name="itemId" th:value="${item.id}">
+                                <input type="number" name="nuevaCantidad" th:value="${item.cantidad}" min="1" style="width: 60px; padding: 5px;">
+                                <button type="submit" title="Actualizar" style="background:none; border:none; cursor:pointer;">🔄</button>
+                            </form>
+                        </td>
+                        
+                        <td th:text="'$' + ${ (item.mueble.precioBase + (item.variante != null ? item.variante.aumentoPrecio : 0)) * item.cantidad }"></td>
+                        
+                        <td>
+                            <form action="/web/cliente/cotizar/eliminar" method="post">
+                                <input type="hidden" name="itemId" th:value="${item.id}">
+                                <button type="submit" class="btn-danger" style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">🗑</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div th:if="${carrito.items.empty}" style="padding: 20px; text-align: center; color: gray;">
+                No has agregado productos todavía.
+            </div>
+
+            <div style="margin-top: 20px; text-align: right;" th:if="${!carrito.items.empty}">
+                <h3 th:text="'Total a Pagar: $' + ${carrito.totalCalculado}"></h3>
+                <form action="/web/cliente/cotizar/comprar" method="post">
+                    <button type="submit" class="btn-primary" style="width: auto; background-color: #28a745; padding: 10px 20px;">✅ Finalizar Compra</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

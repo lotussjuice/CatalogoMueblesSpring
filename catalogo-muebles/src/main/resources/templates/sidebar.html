@@ -1,0 +1,17 @@
+<div th:fragment="sidebar(perfil)" class="sidebar">
+    <h2>Mueblería Hnos</h2>
+    
+    <div th:if="${perfil == 'cliente'}">
+        <a href="/web/cliente/catalogo" th:classappend="${active == 'catalogo'} ? 'active'">🪑 Catálogo</a>
+        <a href="/web/cliente/cotizar" th:classappend="${active == 'cotizar'} ? 'active'">🛒 Carrito </a>
+        <a href="/web/cliente/historial" th:classappend="${active == 'historial'} ? 'active'">📄 Historial</a>
+    </div>
+
+    <div th:if="${perfil == 'gustavo'}">
+        <a href="/web/gustavo/inventario" th:classappend="${active == 'inventario'} ? 'active'">📦 Inventario</a>
+        <a href="/web/gustavo/crear" th:classappend="${active == 'crear'} ? 'active'">🔨 Crear Mueble</a>
+        <a href="/web/gustavo/variantes" th:classappend="${active == 'variantes'} ? 'active'">➕ Variantes</a>
+    </div>
+
+    <a href="/" class="btn-salir">⬅ Salir</a>
+</div>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Catálogo - Cliente</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div th:replace="sidebar :: sidebar(perfil='cliente')"></div>
+
+    <div class="content">
+        <h1>Catálogo de Muebles</h1>
+        <p>Explore nuestra colección exclusiva.</p>
+
+        <div class="catalogo-grid">
+            <div th:each="mueble : ${muebles}" class="producto-card" th:if="${mueble.estado.name() == 'ACTIVO'}">
+                
+                <div class="producto-header">
+                    <h3 class="producto-titulo" th:text="${mueble.nombre}">Nombre</h3>
+                    <span class="producto-tipo" th:text="${mueble.tipo} + ' - ' + ${mueble.tamano}">Tipo</span>
+                </div>
+
+                <div style="flex-grow: 1;">
+                    <p><strong>Material:</strong> <span th:text="${mueble.material}"></span></p>
+                    
+                    <div th:if="${!mueble.variantesDisponibles.empty}" class="variantes-lista">
+                        <strong>Opciones disponibles:</strong>
+                        <ul style="margin: 5px 0; padding-left: 20px;">
+                            <li th:each="v : ${mueble.variantesDisponibles}" 
+                                th:text="${v.nombre} + ' (Extra $' + ${v.aumentoPrecio} + ')'"></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="producto-precio" th:text="'$' + ${mueble.precioBase}">$100</div>
+                    <div class="producto-stock" th:classappend="${mueble.stock < 5} ? 'bajo'" 
+                         th:text="'Stock disponible: ' + ${mueble.stock}"></div>
+                    <a th:href="@{/web/cliente/cotizar(mueblePreseleccionado=${mueble.id})}" class="btn-comprar" style="margin-top: 15px;">
+                        Comprar Ahora
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

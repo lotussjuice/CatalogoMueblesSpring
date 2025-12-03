@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Historial - Cliente</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div th:replace="sidebar :: sidebar(perfil='cliente')"></div>
+
+    <div class="content">
+        <h1>Historial de Compras</h1>
+        
+        <div th:if="${mensaje}" th:class="'alert alert-' + ${tipoMensaje}" th:text="${mensaje}"></div>
+        <div th:each="c : ${cotizaciones}" class="card" th:if="${c.estado.name() == 'CONFIRMADA'}">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:10px;">
+                <h3 style="margin:0; color:#8B4513;">
+                    Orden #<span th:text="${c.id}"></span>
+                </h3>
+                <span style="background:#d4edda; color:#155724; padding:5px 10px; border-radius:15px; font-size:0.8rem;">CONFIRMADA</span>
+                <span th:text="${#temporals.format(c.fechaCreacion, 'dd-MM-yyyy HH:mm')}">Fecha</span>
+            </div>
+
+            <table style="margin-top:0; font-size:0.9rem;">
+                <tr th:each="item : ${c.items}" style="background-color: #fafafa;">
+                    <td style="border:none;">🔹 <strong th:text="${item.mueble.nombre}"></strong></td>
+                    <td style="border:none;" th:text="${item.variante != null ? 'Variante: ' + item.variante.nombre : 'Estándar'}"></td>
+                    <td style="border:none;">x<span th:text="${item.cantidad}"></span></td>
+                    <td style="border:none; text-align:right;" th:text="'$' + ${item.calcularSubtotal()}"></td>
+                </tr>
+            </table>
+
+            <div style="text-align:right; margin-top:10px; font-weight:bold; font-size:1.2rem; color:#3E2723;">
+                Total Pagado: $<span th:text="${c.totalCalculado}"></span>
+            </div>
+        </div>
+        
+        <div th:if="${#lists.isEmpty(cotizaciones)}" style="text-align:center;">
+            <p>No hay compras registradas.</p>
+        </div>
+    </div>
+</body>
+</html>

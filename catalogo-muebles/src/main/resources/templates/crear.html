@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Crear Mueble - Gustavo</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div th:replace="sidebar :: sidebar(perfil='gustavo')"></div>
+
+    <div class="content">
+        <h1>Crear Nuevo Mueble</h1>
+
+        <div class="card">
+            <form action="/web/gustavo/crear" method="post">
+                <div class="form-group">
+                    <label>Nombre del Mueble:</label>
+                    <input type="text" name="nombre" required placeholder="Ej: Mesa de Roble">
+                </div>
+
+                <div class="form-group">
+                    <label>Tipo:</label>
+                    <input type="text" name="tipo" placeholder="Ej: Mesa, Silla, Sillón">
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                    <div class="form-group">
+                        <label>Precio Base ($):</label>
+                        <input type="number" name="precioBase" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Stock Inicial:</label>
+                        <input type="number" name="stock" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Material:</label>
+                    <input type="text" name="material">
+                </div>
+
+                <div class="form-group">
+                    <label>Tamaño:</label>
+                    <select name="tamano">
+                        <option th:each="t : ${tamanos}" th:value="${t}" th:text="${t}"></option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+                    <label style="margin-bottom: 10px;">Variantes Disponibles:</label>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
+                        
+                        <div th:each="v : ${variantes}" style="background: #f9f9f9; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                            <input type="checkbox" name="variantesIds" th:value="${v.id}" th:id="'var_' + ${v.id}">
+                            <label th:for="'var_' + ${v.id}" style="display: inline; font-weight: normal; cursor: pointer;"
+                                   th:text="${v.nombre} + ' (+$' + ${v.aumentoPrecio} + ')'"></label>
+                        </div>
+                        
+                    </div>
+                    <small style="color: grey;">Seleccione las modificaciones aplicables a este mueble.</small>
+                </div>
+
+                <button type="submit" class="btn-primary" style="margin-top: 20px;">Guardar Mueble</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
