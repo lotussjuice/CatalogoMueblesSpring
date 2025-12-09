@@ -6,12 +6,10 @@ services:
     ports:
     # Mapeo del puerto 3306 del contenedor al 3307 del host para evitar conflictos
       - "3307:3306"
+    env_file: .env  
     environment:
-      # Configuración de la base de datos
       MYSQL_DATABASE: muebleria_db
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_PASSWORD: root
-      MYSQL_USER: user
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
       # Persistencia de datos
       - db_data:/var/lib/mysql
@@ -35,13 +33,12 @@ services:
     depends_on:
       mysqldb:
         condition: service_healthy 
+    env_file: .env # <--- EL BACKEND TAMBIÉN NECESITA LEERLAS
     environment:
-      SERVER_PORT: 8080
-      # Configuración de la conexión a la base de datos
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysqldb:3306/muebleria_db?allowPublicKeyRetrieval=true&useSSL=false
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: root
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      # Pasamos las variables para que Spring Boot las pueda leer
+      SPRING_DATASOURCE_URL: ${MYSQL_URL}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASS}
     networks:  
       - muebleria_net
 
